@@ -68,3 +68,7 @@ To test the UI without ESP32 hardware:
 | Admin User    | admin         |
 | Admin Pass    | admin         |
 | Dashboard URL | 192.168.4.1   |
+
+## 👨‍💻 Developer
+
+- Jefter Tokomere
