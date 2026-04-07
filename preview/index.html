@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESP32 WiFi Extender — Control Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">📡</div>
+    <div>
+      <h1>WiFi Extender</h1>
+      <div class="ver">ESP32 Control Panel v2.0</div>
+    </div>
+  </div>
+  <div class="header-status">
+      <span><span class="status-dot" id="srcStatus"></span>SOURCE: <span id="srcLabel">--</span></span>
+    <span><span class="status-dot online"></span>AP: ACTIVE</span>
+      <span id="uptimeDisplay">00:00:00</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showTab('dashboard',this)">Dashboard</button>
+  <button class="nav-btn" onclick="showTab('devices',this)">Devices</button>
+  <button class="nav-btn" onclick="showTab('network',this)">Network</button>
+  <button class="nav-btn" onclick="showTab('settings',this)">Settings</button>
+  <button class="nav-btn" onclick="showTab('logs',this)">System Log</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="tab active" id="tab-dashboard">
+  <div class="grid grid-4">
+    <div class="card"><div class="stat"><div class="stat-value" id="sClients">0</div><div class="stat-label">Connected Devices</div><div class="stat-bar"><div class="stat-bar-fill" id="clientBar" style="width:0%"></div></div></div></div>
+    <div class="card"><div class="stat"><div class="stat-value" id="sRSSI">--</div><div class="stat-label">Signal dBm</div><div class="stat-bar"><div class="stat-bar-fill" id="rssiBar" style="width:0%"></div></div></div></div>
+    <div class="card"><div class="stat"><div class="stat-value" id="sUptime">--</div><div class="stat-label">Uptime</div><div class="stat-bar"><div class="stat-bar-fill" style="width:100%"></div></div></div></div>
+    <div class="card"><div class="stat"><div class="stat-value" id="sHeap">--</div><div class="stat-label">Free Memory</div><div class="stat-bar"><div class="stat-bar-fill" id="heapBar" style="width:0%"></div></div></div></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-header"><h3>📶 Source Network</h3></div>
+      <div class="card-body">
+        <table>
+          <tr><td class="dim">SSID</td><td id="dSrcSSID">--</td></tr>
+          <tr><td class="dim">IP Address</td><td id="dStaIP">--</td></tr>
+          <tr><td class="dim">Signal Strength</td><td id="dRSSI">--</td></tr>
+          <tr><td class="dim">Status</td><td id="dSrcStat">--</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📡 Access Point</h3></div>
+      <div class="card-body">
+        <table>
+          <tr><td class="dim">SSID</td><td id="dApSSID">--</td></tr>
+          <tr><td class="dim">IP Address</td><td id="dApIP">--</td></tr>
+          <tr><td class="dim">Clients</td><td id="dClients">--</td></tr>
+          <tr><td class="dim">Chip</td><td id="dChip">--</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>🖥️ System Terminal</h3></div>
+    <div class="card-body"><div class="terminal" id="sysTerminal"></div></div>
+  </div>
+</div>
+
+<!-- DEVICES -->
+<div class="tab" id="tab-devices">
+  <div class="card">
+    <div class="card-header"><h3>👥 Connected Devices</h3><button class="btn btn-sm" onclick="refreshClients()">⟳ Refresh</button></div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Device</th><th>MAC Address</th><th>IP Address</th><th>Connected</th><th>Time Limit</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="devicesList"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NETWORK -->
+<div class="tab" id="tab-network">
+  <div class="card">
+    <div class="card-header"><h3>🔍 Available Networks</h3><button class="btn btn-sm" onclick="scanNetworks()">⟳ Scan</button></div>
+    <div class="card-body" id="networkList"><p class="dim">Click Scan to discover nearby networks...</p></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="tab" id="tab-settings">
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-header"><h3>📡 AP Configuration</h3></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Network Name (SSID)</label><input class="form-input" id="setApSSID" placeholder="ESP32_Extender"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="setApPass" type="password" placeholder="Min 8 characters"></div>
+        <div class="form-group"><label class="form-label">Max Clients</label>
+          <select class="form-input"><option>5</option><option selected>10</option><option>15</option></select>
+        </div>
+        <div class="btn-group"><button class="btn btn-primary" onclick="saveAPSettings()">💾 Save AP Settings</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🔐 Admin Credentials</h3></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="setAdmUser" placeholder="admin"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="setAdmPass" type="password" placeholder="New password"></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password"></div>
+        <div class="btn-group"><button class="btn btn-primary" onclick="saveAdminSettings()">💾 Save Credentials</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>⚙️ System Actions</h3></div>
+    <div class="card-body">
+      <div class="btn-group">
+        <button class="btn btn-danger" onclick="if(confirm('Reboot device?'))rebootDevice()">🔄 Reboot Device</button>
+        <button class="btn btn-danger" onclick="if(confirm('Factory reset?'))factoryReset()">⚠️ Factory Reset</button>
+        <button class="btn">📥 Export Config</button>
+        <button class="btn">📤 Import Config</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGS -->
+<div class="tab" id="tab-logs">
+  <div class="card">
+    <div class="card-header"><h3>📋 System Log</h3><button class="btn btn-sm" onclick="document.getElementById('logTerminal').innerHTML=''">Clear</button></div>
+    <div class="card-body"><div class="terminal" id="logTerminal" style="max-height:500px"></div></div>
+  </div>
+</div>
+</div>
+
+<!-- TIME LIMIT MODAL -->
+<div class="modal-overlay" id="timeLimitModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h3>⏱ SET TIME LIMIT</h3>
+    <p style="font-size:11px;color:var(--text-dim);margin-bottom:16px">Device: <span id="tlDevice">Phone-1 (AA:BB:CC:DD:EE:01)</span></p>
+    <div class="form-group">
+      <label class="form-label">Access Duration</label>
+      <select class="form-input" id="tlMinutes">
+        <option value="0">♾️ Unlimited</option>
+        <option value="15">15 Minutes</option>
+        <option value="30">30 Minutes</option>
+        <option value="60">1 Hour</option>
+        <option value="120">2 Hours</option>
+        <option value="480">8 Hours</option>
+        <option value="1440">24 Hours</option>
+      </select>
+    </div>
+    <div class="btn-group"><button class="btn btn-primary" onclick="applyTimeLimit()">✓ Apply</button><button class="btn" onclick="closeModal()">Cancel</button></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
