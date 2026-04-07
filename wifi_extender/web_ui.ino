@@ -130,12 +130,38 @@ tr:hover td{background:rgba(0,212,255,0.03)}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Responsive */
-@media(max-width:600px){
+@media(max-width:900px){
+.main{padding:14px}
+.grid-2{grid-template-columns:1fr}
+.header{padding:10px 14px}
+.header-status{gap:10px;flex-wrap:wrap}
+.card-header{gap:8px;flex-wrap:wrap}
+}
+
+@media(max-width:700px){
 .header{flex-direction:column;gap:8px;text-align:center}
-.header-status{justify-content:center}
-.main{padding:12px}
+.header-status{justify-content:center;font-size:10px}
+.logo h1{font-size:14px;letter-spacing:2px}
+.logo .ver{font-size:9px}
+.main{padding:10px}
 .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+.stat{padding:12px}
 .stat-value{font-size:22px}
+.card-body{padding:12px}
+.btn-group .btn{flex:1 1 100%}
+.modal{width:94%;padding:16px}
+.modal h3{font-size:12px;letter-spacing:1px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{min-width:640px}
+.wifi-item{padding:10px 12px}
+}
+
+@media(max-width:480px){
+.nav-btn{padding:10px 12px;font-size:10px;letter-spacing:0}
+.header-status{gap:6px}
+.wifi-item{flex-direction:column;align-items:flex-start;gap:6px}
+.wifi-info{width:100%;justify-content:space-between}
+.terminal{max-height:180px;font-size:10px}
 }
 </style>
 </head>

@@ -652,3 +652,48 @@ tr:hover td { background: rgba(0, 212, 255, 0.03); }
   .card-body { padding: 14px; }
   th, td { padding: 8px 10px; }
 }
+
+@media (max-width: 900px) {
+  .card-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .btn-group .btn {
+    flex: 1 1 48%;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 700px) {
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    min-width: 640px;
+  }
+  .modal {
+    width: 94%;
+    padding: 18px;
+  }
+  .btn-group .btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .wifi-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .wifi-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .terminal {
+    max-height: 180px;
+    font-size: 10px;
+  }
+}
